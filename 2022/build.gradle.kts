@@ -13,7 +13,12 @@ repositories {
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
+//    testImplementation(kotlin("test"))
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.0")
+    testImplementation("org.assertj:assertj-core:3.23.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
 }
 
 tasks.test {
