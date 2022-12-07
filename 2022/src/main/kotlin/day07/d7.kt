@@ -27,40 +27,33 @@ fun process(
     root: FileSystemEntry.Dir,
     workingDir: FileSystemEntry.Dir,
     line: String,
-    rest: Iterator<String>
-): FileSystemEntry.Dir =
-    if (line.startsWith(FileSystemCommand.PREFIX)) {
+    nextLinesIter: Iterator<String>
+): FileSystemEntry.Dir {
+    val newWorkingDir = if (line.startsWith(FileSystemCommand.PREFIX)) {
         when (val cmd = FileSystemCommand.from(line)) {
-            is FileSystemCommand.ChangeDirectory -> when {
-                cmd.isIntoRoot() ->
-                    if (rest.hasNext())
-                        process(root, root, rest.next(), rest)
-                    else
+            is FileSystemCommand.ChangeDirectory ->
+                when {
+                    cmd.isIntoRoot() ->
                         root
-                cmd.isIntoParent() ->
-                    if (rest.hasNext())
-                        process(root, workingDir.parent!!, rest.next(), rest)
-                    else
-                        root
-                else -> // isIntoChild
-                    if (rest.hasNext())
-                        process(root, workingDir.childDir(cmd.arg), rest.next(), rest)
-                    else
-                        root
-            }
+                    cmd.isIntoParent() ->
+                        workingDir.parent!!
+                    else -> // isIntoChild
+                        workingDir.childDir(cmd.arg)
+                }
             is FileSystemCommand.List ->
-                if (rest.hasNext())
-                    process(root, workingDir, rest.next(), rest)
-                else
-                    root
+                workingDir // stay in working-dir
         }
     } else {
         FileSystemEntry.fromListOutput(line, workingDir)
-        if (rest.hasNext())
-            process(root, workingDir, rest.next(), rest)
-        else
-            root
+        workingDir // stay in working-dir
     }
+
+    return if (nextLinesIter.hasNext())
+        process(root, newWorkingDir, nextLinesIter.next(), nextLinesIter)
+    else
+        root
+}
+
 
 sealed interface FileSystemEntry {
     val name: String
@@ -72,10 +65,6 @@ sealed interface FileSystemEntry {
 
     data class Dir(override val name: String, override val parent: Dir?) : FileSystemEntry {
         val entries = mutableSetOf<FileSystemEntry>()
-
-        init {
-            parent?.entries?.add(this)
-        }
 
         fun childDir(name: String): Dir = entries.single { it.name == name } as Dir
 
@@ -89,10 +78,6 @@ sealed interface FileSystemEntry {
     }
 
     data class File(override val name: String, val size: Int, override val parent: Dir) : FileSystemEntry {
-        init {
-            parent.entries.add(this)
-        }
-
         override fun totalSize(): Int = size
 
         override fun findDirsRecursive(predicate: (FileSystemEntry) -> Boolean): List<FileSystemEntry> = emptyList()
@@ -103,10 +88,12 @@ sealed interface FileSystemEntry {
 
         fun fromListOutput(line: String, parent: Dir): FileSystemEntry {
             val parts = line.split(" ")
-            return if (parts[0] == "dir")
+            val entry = if (parts[0] == "dir")
                 Dir(parts[1], parent)
             else
                 File(parts[1], parts[0].toInt(), parent)
+            parent.entries.add(entry)
+            return entry
         }
     }
 }
