@@ -6,13 +6,29 @@ fun main() {
     val hill = getResourceAsFile("day12.txt").useLines { Hill.parse(it) }
     println("${hill.start} ${hill.end}")
     val graph = Graph.build(hill)
-//    println("${graph.verts}")//    println("${graph.edges}")
 
-    val shortestPath = graph.dijkstra(hill.start, hill.end)
-    val steps = shortestPath.size - 1
+    // part 1
+//    val shortestPath = graph.dijkstra(hill.start, hill.end)
+//    val steps = shortestPath.size - 1
+//    println("### $steps")
 
-//    println("from ${hill.start} to ${hill.end}:\n" + shortestPath.joinToString("\n"))
-    println("### $steps")
+    // part 2
+    val starts = hill.heightmap
+        .filter { it.value == 0 }
+        .map { it.key }
+    val startsCount = starts.size
+
+    val steps = starts.mapIndexed { idx, start ->
+        print("dijkstra $idx from $start... ")
+        val s = graph.dijkstra(start, hill.end).size
+        println(s)
+        s
+    }
+
+    val min = steps
+        .filter { it > 1 }
+        .min() - 1
+    println(min)
 }
 
 data class Hill(
@@ -102,27 +118,12 @@ data class Graph(
         return buildPathFrom(prev, start, end)
     }
 
-    private fun buildPathFrom(prev: MutableMap<Pos, Pos>, from: Pos, to: Pos): List<Pos> {
-        return if (prev[to] == null) {
+    private fun buildPathFrom(prev: MutableMap<Pos, Pos>, from: Pos, to: Pos): List<Pos> =
+        if (prev[to] == null) {
             listOf(to)
         } else {
             buildPathFrom(prev, from, prev[to]!!) + listOf(to)
         }
-    }
-
-//    private fun buildPathFrom2(prev: MutableMap<Pos, Pos>, start: Pos, end: Pos): List<Pos> {
-//        val s = mutableListOf<Pos>()
-//        var u: Pos? = end
-//
-//        if (prev[u] != null || u == start) {
-//            while (u != null) {
-//                s.add(u)
-//                u = prev[u]
-//            }
-//        }
-//        return s.reversed()
-//    }
-
 
     companion object {
         fun build(hill: Hill): Graph {
