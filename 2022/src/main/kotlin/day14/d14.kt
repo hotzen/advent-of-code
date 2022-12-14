@@ -9,12 +9,14 @@ fun main() {
                 line.split(" -> ")
                     .map { Pos.from(it) }
                     .windowed(2)
-                    .map { w -> Line.from(w[0], w[1]) }
+                    .map { w -> ClosedLine.from(w[0], w[1]) }
             )
         }.toList()
     }
 
     val c = Cave(shapes)
+    println(c)
+
     val count = c.countFillSand(POUR_IN)
     println(c.draw())
     println(count)
@@ -24,7 +26,9 @@ val POUR_IN = Pos(500, 0)
 
 class Cave(val shapes: List<Shape>) {
     val tiles = mutableMapOf<Pos, Tile>()
-    val bounds = shapes.map { it.bounds() }.reduce(Bounds::extend)
+    val boundsByShapes = shapes.map { it.bounds() }.reduce(Bounds::extend)
+    val floor = Floor(boundsByShapes.max.y + 2)
+    val bounds = boundsByShapes.extend(Bounds(POUR_IN, Pos(POUR_IN.x, floor.y)))
 
     init {
         for (shape in shapes) {
@@ -36,7 +40,13 @@ class Cave(val shapes: List<Shape>) {
         }
     }
 
-    fun tileAt(pos: Pos): Tile = tiles[pos] ?: Tile.AIR
+    fun tileAt(pos: Pos): Tile =
+        if (floor.contains(pos)) {
+            Tile.ROCK
+        } else {
+            tiles[pos] ?: Tile.AIR
+        }
+
 
     fun putTile(pos: Pos, tile: Tile) {
         if (tile == Tile.AIR) {
@@ -52,11 +62,15 @@ class Cave(val shapes: List<Shape>) {
         while (fillOneSand(pourIn)) {
 //            println(this.draw())
             count++
+//            return count
         }
         return count
     }
 
     fun fillOneSand(start: Pos): Boolean {
+        if (tileAt(start) == Tile.SAND) {
+            return false
+        }
         putTile(start, Tile.SAND)
         var pos = start
         while (true) {
@@ -72,10 +86,15 @@ class Cave(val shapes: List<Shape>) {
     fun tryMoveSandFrom(from: Pos): Pos? {
         for (dir in Direction.values()) {
             val dest = dir.apply(from)
-            if (!bounds.contains(dest)) {
-                putTile(from, Tile.AIR)
-                return null // VOID
+
+//            if (!bounds.contains(dest)) {
+//                putTile(from, Tile.AIR)
+//                return null // VOID
+//            }
+            if (floor.contains(dest)) {
+                continue // resting safe
             }
+
             if (canMoveSandTo(dest)) {
                 putTile(from, Tile.AIR)
                 putTile(dest, Tile.SAND)
@@ -92,7 +111,7 @@ class Cave(val shapes: List<Shape>) {
             Tile.SAND -> false
         }
 
-    override fun toString(): String = "$bounds ${tiles.size}"
+    override fun toString(): String = "$bounds Floor: $floor ${tiles.size}"
 
     fun draw(): String {
         val sb = StringBuffer()
@@ -106,7 +125,7 @@ class Cave(val shapes: List<Shape>) {
     }
 }
 
-data class Shape(val lines: List<Line>) {
+data class Shape(val lines: List<ClosedLine>) {
     fun bounds() = Bounds(
         lines.fold(POUR_IN) { min, line ->
             min.min(line.start).min(line.end)
@@ -188,11 +207,15 @@ data class Pos(val x: Int, val y: Int) : Comparable<Pos> {
     }
 }
 
-sealed interface Line : Iterable<Pos> {
+data class Floor(val y: Int) {
+    fun contains(pos: Pos): Boolean = pos.y == y
+}
+
+sealed interface ClosedLine : Iterable<Pos> {
     val start: Pos
     val end: Pos
 
-    data class XLine(val x: IntProgression, val y: Int) : Line {
+    data class XLine(val x: IntProgression, val y: Int) : ClosedLine {
         override val start: Pos
             get() = Pos(x.first, y)
 
@@ -209,7 +232,7 @@ sealed interface Line : Iterable<Pos> {
         override fun toString(): String = "XRange(${x.first}..${x.last}, $y)"
     }
 
-    data class YLine(val x: Int, val y: IntProgression) : Line {
+    data class YLine(val x: Int, val y: IntProgression) : ClosedLine {
         override val start: Pos
             get() = Pos(x, y.first)
 
@@ -227,7 +250,7 @@ sealed interface Line : Iterable<Pos> {
     }
 
     companion object {
-        fun from(a: Pos, b: Pos): Line {
+        fun from(a: Pos, b: Pos): ClosedLine {
             require((a.x == b.x).xor(a.y == b.y)) { "$a / $b" }
             return if (a.x == b.x) {
                 if (a.y < b.y)
