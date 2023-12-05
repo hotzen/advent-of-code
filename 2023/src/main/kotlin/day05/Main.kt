@@ -1,10 +1,15 @@
 package day05
 
 import util.getResourceAsFile
+import kotlinx.coroutines.*
+import util.pmap
 
 fun main() {
 	val blocks = getResourceAsFile("day05.in").readText().split("\n\n")
 	val seeds = blocks[0].removePrefix("seeds: ").split(" ").map { it.toLong() }
+		.windowed(size = 2, step = 2)
+		.map { it[0] until (it[0] + it[1]) }
+
 	val maps = mutableMapOf<String, Mapping>()
 
 	blocks.drop(1).map { block ->
@@ -20,15 +25,28 @@ fun main() {
 	println("seeds: $seeds")
 	println("maps:\n" + maps.values.joinToString("\n"))
 
-	val locations = seeds.map { seed ->
-		seed to follow(maps, "seed", "location", seed)
+//	val locations = seeds.flatMap { seedRange ->
+//		seedRange.map { s ->
+//			s to follow(maps, "seed", "location", s)
+//		}
+//	}
+//	println(locations)
+//	println(locations.map { it.second }.min())
+
+	val locs = runBlocking(Dispatchers.Default) {
+		seeds.pmap { seedRange ->
+			var minLoc = Long.MAX_VALUE
+			for (s in seedRange) {
+				val loc = follow(maps, "seed", "location", s)
+				minLoc = Math.min(minLoc, loc)
+			}
+			minLoc
+		}.toList()
 	}
-	println(locations)
-	println(locations.map { it.second }.min())
+	println(locs.min())
 }
 
 fun follow(maps: MutableMap<String, Mapping>, from: String, terminal: String, n: Long): Long {
-//	println("following $from: $n")
 	val mapping = maps[from]!!
 	val next = mapping.map(n)
 

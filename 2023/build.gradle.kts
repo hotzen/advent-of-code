@@ -15,6 +15,7 @@ repositories {
 dependencies {
 //    testImplementation(kotlin("test"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.0")
     testImplementation("org.assertj:assertj-core:3.23.1")
