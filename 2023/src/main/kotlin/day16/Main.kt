@@ -1,6 +1,6 @@
 package day16
 
-import util.getResourceAsFile
+import getResourceAsFile
 import java.util.LinkedList
 import java.util.Queue
 import kotlin.math.max

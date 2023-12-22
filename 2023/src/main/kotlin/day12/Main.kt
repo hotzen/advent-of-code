@@ -1,6 +1,6 @@
 package day12
 
-import util.getResourceAsFile
+import getResourceAsFile
 
 data class Pos(val x: Long, val y: Long) {
 

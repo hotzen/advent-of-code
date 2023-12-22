@@ -1,6 +1,6 @@
 package day03
 
-import util.getResourceAsFile
+import getResourceAsFile
 
 fun main() {
 

@@ -1,6 +1,6 @@
 package day08p2
 
-import util.getResourceAsFile
+import getResourceAsFile
 
 typealias NodeMap = Map<String, Pair<String, String>>
 

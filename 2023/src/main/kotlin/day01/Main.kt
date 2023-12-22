@@ -1,6 +1,6 @@
 package day01
 
-import util.getResourceAsFile
+import getResourceAsFile
 
 fun main() {
 	val s1 = (1..9).toList()

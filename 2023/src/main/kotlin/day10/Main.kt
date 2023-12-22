@@ -1,6 +1,6 @@
 package day10
 
-import util.getResourceAsFile
+import getResourceAsFile
 
 typealias Path = List<Pos>
 

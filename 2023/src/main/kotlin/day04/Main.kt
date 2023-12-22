@@ -1,6 +1,6 @@
 package day04
 
-import util.getResourceAsFile
+import getResourceAsFile
 
 fun main() {
 	val pattern = "Card[ ]+([0-9]+): (.+)\\|(.+)".toRegex()

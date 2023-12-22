@@ -1,6 +1,6 @@
 package day06
 
-import util.getResourceAsFile
+import getResourceAsFile
 
 fun main() {
 //	val (times, dists) = getResourceAsFile("day06.ex").readText().trim()

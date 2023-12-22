@@ -1,43 +1,27 @@
-package day18
+package day19
 
 import input
 import println
 
 fun main() {
-	val input = input("day18ex").readLines()
-		.map { it.split(" ") }
+	val (in_wf, in_parts) = input("day19ex").readText()
+		.trim()
+		.split("\n\n")
+		.map { it.split("\n") }
 
-	part1(input).println()
+	val workflows = in_wf.map { Workflow.from(it) }
+	workflows.println()
+
+	val parts = in_parts.map { Part.from(it) }
+	parts.println()
+
+	part1(workflows, parts).println()
 //	part2(input).println()
 }
 
-fun part1(lines: List<List<String>>): Int {
-	val trench = mutableListOf<Pos>()
+fun part1(workflows: List<Workflow>, parts: List<Part>): Int {
 
-	var p = Pos(0, 0)
-	trench.add(p)
-
-	var min = Pos(Integer.MAX_VALUE, Integer.MAX_VALUE)
-	var max = Pos(Integer.MIN_VALUE, Integer.MIN_VALUE)
-
-	for (line in lines) {
-		val dir = line[0]
-		val meters = line[1].toInt()
-		for (i in 1..meters) {
-			p = p + Dirs[dir]!!
-			println("$dir $meters: $p")
-
-			min = min.min(p)
-			max = max.max(p)
-		}
-		trench.add(p)
-	}
-
-	var cubic = 0
-	for (y in min.y..max.y) {
-
-	}
-
+	
 
 	return 0
 }
@@ -46,26 +30,66 @@ fun part2(input: List<String>): Int {
 	return input.size
 }
 
-data class Pos(val x: Int, val y: Int) {
+data class Part(val x: Int, val m: Int, val a: Int, val s: Int) {
 
-	fun min(other: Pos) = Pos(
-		kotlin.math.min(this.x, other.x),
-		kotlin.math.min(this.y, other.y)
-	)
+	companion object {
 
-	fun max(other: Pos) = Pos(
-		kotlin.math.max(this.x, other.x),
-		kotlin.math.max(this.y, other.y)
-	)
+		val p = "\\{x=(\\d+),m=(\\d+),a=(\\d+),s=(\\d+)\\}".toRegex()
 
-	operator fun plus(other: Pos): Pos = Pos(x + other.x, y + other.y)
-
-	override fun toString(): String = "($x/$y)"
+		fun from(s: String): Part {
+			val m = p.matchEntire(s)!!
+			return Part(
+				m.groupValues[1].toInt(),
+				m.groupValues[2].toInt(),
+				m.groupValues[3].toInt(),
+				m.groupValues[4].toInt(),
+			)
+		}
+	}
 }
 
-val Dirs = mapOf(
-	"D" to Pos(0, 1), // down
-	"U" to Pos(0, -1), // up
-	"R" to Pos(1, 0), // right
-	"L" to Pos(-1, 0), // left
-)
+data class Workflow(val name: String, val rules: List<(Part) -> String?>) {
+
+	fun eval(p: Part): String {
+		for (r in rules) {
+			val res = r(p)
+			if (res != null) return res
+		}
+		throw IllegalStateException("wtf")
+	}
+
+	companion object {
+
+		val p = """([a-z]+)([<>])([0-9]+)\:([a-z]+)""".toRegex()
+
+		fun from(s: String): Workflow {
+			val (name, def) = s.split("{")
+			val rules = def.removeSuffix("}").split(",")
+				.map { rule ->
+					p.matchEntire(rule)
+						?.let { m ->
+							val (m_full, m_cat, m_op, m_num, m_wf) = m.groupValues
+							val getter: (Part) -> Int = when (m_cat) {
+								"x" -> Part::x
+								"m" -> Part::m
+								"a" -> Part::a
+								"s" -> Part::s
+								else -> throw IllegalArgumentException("getter")
+							}
+							val op: (Int) -> Boolean = when (m_op) {
+								"<" -> { x -> x < m_num.toInt() }
+								">" -> { x -> x > m_num.toInt() }
+								else -> throw IllegalArgumentException("op")
+							}
+							val rule: (Part) -> String? = { part ->
+								if (op(getter(part))) m_wf
+								else null
+							}
+							rule
+						}
+						?: { part -> rule }
+				}
+			return Workflow(name, rules)
+		}
+	}
+}

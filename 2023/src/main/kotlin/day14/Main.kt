@@ -1,6 +1,6 @@
 package day14
 
-import util.getResourceAsFile
+import getResourceAsFile
 
 fun main() {
 	val lines = getResourceAsFile("day14.ex").readText().trim().split("\n").toMutableList()

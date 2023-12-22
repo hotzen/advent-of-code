@@ -1,8 +1,8 @@
 package day05
 
-import util.getResourceAsFile
+import getResourceAsFile
 import kotlinx.coroutines.*
-import util.pmap
+import pmap
 
 fun main() {
 	val blocks = getResourceAsFile("day05.in").readText().split("\n\n")

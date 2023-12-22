@@ -1,6 +1,6 @@
 package day07
 
-import util.getResourceAsFile
+import getResourceAsFile
 
 typealias CardsFreq = Map<Char, Int>
 

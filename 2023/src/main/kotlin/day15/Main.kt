@@ -1,6 +1,6 @@
 package day15
 
-import util.getResourceAsFile
+import getResourceAsFile
 
 fun main() {
 	val initSeq = getResourceAsFile("day15.in").readText().trim().split(",")

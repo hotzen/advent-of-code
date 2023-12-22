@@ -1,6 +1,6 @@
 package day13
 
-import util.getResourceAsFile
+import getResourceAsFile
 import kotlin.math.max
 
 data class Pos(val x: Int, val y: Int) {
