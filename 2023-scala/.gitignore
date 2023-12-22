@@ -1,0 +1,12 @@
+# IntelliJ
+.bsp/
+.idea/
+
+# macOS
+.DS_Store
+
+# SBT
+target/
+
+.metals
+.scala-build
