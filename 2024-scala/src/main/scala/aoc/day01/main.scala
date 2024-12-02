@@ -1,9 +1,10 @@
+package day01
+
 import scala.io.Source
 import java.util.LinkedList
 import scala.collection.mutable.Queue
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable
-
 
 val in = Source
   .fromFile("input/day01.txt")
@@ -25,7 +26,6 @@ def part1(): Unit = {
   val dist = lefts.sorted.zip(rights.sorted).map((l, r) => (l - r).abs).sum
   println(dist)
 }
-
 
 @main def part2(): Unit = {
   val init = (
@@ -52,16 +52,4 @@ def part1(): Unit = {
   }._1
 
   println(scoredLefts.sum())
-
-  // val scoredRights = rights.foldLeft(init2) {
-  //   case ((res, cache), x) if cache.contains(x) =>
-  //     (cache(x) :: res, cache)
-  //   case ((res, cache), x) => {
-  //     val score = x * lefts.count(_ == x)
-  //     (score :: res, cache + (x -> score))
-  //   }
-  // }
-
-  // val dist = lefts.sorted.zip(rights.sorted).map((l, r) => (l - r).abs).sum
-  // println(dist)
 }
