@@ -6,7 +6,6 @@ import scala.collection.mutable.Queue
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable
 
-
 val in = Source
   .fromFile("input/day02.txt")
   .mkString
