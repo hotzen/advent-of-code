@@ -15,5 +15,5 @@ extension (s: String)
   }
 
 extension (arr: Array[Int])
-  def midElem(): Int = arr(arr.size / 2)
+  def midElem: Int = arr(arr.size / 2)
   
