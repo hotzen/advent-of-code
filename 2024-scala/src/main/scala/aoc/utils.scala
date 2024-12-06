@@ -38,6 +38,12 @@ extension (pos: Pos)
   def isWithin(dim: Pos): Boolean =
     pos._1 >= 0 && pos._1 <= dim._1 &&
     pos._2 >= 0 && pos._2 <= dim._2
+  def around(): List[Pos] = List(
+    pos.go(Dir.Up),
+    pos.go(Dir.Down),
+    pos.go(Dir.Left),
+    pos.go(Dir.Right),
+  )
   // def maxX(other: Pos): Pos = (pos._1 max other._1, pos._2)
   // def maxY(other: Pos): Pos = (pos._1, pos._2 max other._2)
 
