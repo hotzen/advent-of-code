@@ -16,4 +16,29 @@ extension (s: String)
 
 extension (arr: Array[Int])
   def midElem: Int = arr(arr.size / 2)
+
+type Pos = (Int, Int)
+
+object Dir {
+  val Up = (0, -1)
+  val Down = (0, 1)
+  
+  val Left = (-1, 0)
+  val Right = (1, 0)
+  
+  val UpLeft = (-1, -1)
+  val UpRight = (1, -1)
+  val DownLeft = (-1, 1)
+  val DownRight = (1, 1)
+}
+
+extension (pos: Pos)
+  def go(dir: Pos): Pos = (pos._1 + dir._1, pos._2 + dir._2)
+  def max(other: Pos): Pos = (pos._1 max other._1, pos._2 max other._2)
+  def isWithin(dim: Pos): Boolean =
+    pos._1 >= 0 && pos._1 <= dim._1 &&
+    pos._2 >= 0 && pos._2 <= dim._2
+  // def maxX(other: Pos): Pos = (pos._1 max other._1, pos._2)
+  // def maxY(other: Pos): Pos = (pos._1, pos._2 max other._2)
+
   
