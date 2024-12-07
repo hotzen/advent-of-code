@@ -21,21 +21,18 @@ val TheOps = List[BinOp](_ + _, _ * _, concat)
 
 @main def main(): Unit = {
   val res = in.map((exp, nums) =>
-    val opCombinations = genOpCombinations(nums.length - 1, TheOps)
-    val validResults = opCombinations.count(opCombi => calc(exp, nums, opCombi))
+    val validResults = genOpCombinations(nums.length - 1, TheOps).count(opCombi => calc(exp, nums, opCombi))
     if (validResults > 0) exp else 0
   )
   println(res.sum())
 }
 
 def calc(exp: Long, nums: List[Long], ops: List[BinOp]): Boolean = {
-  val act = ops
-    .zip(nums.tail)
-    .foldLeft(nums.head)((accu, opNum) =>
-      val (op, num) = opNum
-      if (accu > exp) accu // stop
-      else op(accu, num)
-    )
+  val act = ops.zip(nums.tail).foldLeft(nums.head)((accu, opNum) =>
+    val (op, num) = opNum
+    if (accu > exp) accu // stop
+    else op(accu, num)
+  )
   act == exp
 }
 
