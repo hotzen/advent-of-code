@@ -32,19 +32,36 @@ object Dir {
   val DownRight = (1, 1)
 }
 
-extension (pos: Pos)
-  def go(dir: Pos): Pos = (pos._1 + dir._1, pos._2 + dir._2)
-  def max(other: Pos): Pos = (pos._1 max other._1, pos._2 max other._2)
-  def isWithin(dim: Pos): Boolean =
-    pos._1 >= 0 && pos._1 <= dim._1 &&
-    pos._2 >= 0 && pos._2 <= dim._2
-  def around(): List[Pos] = List(
-    pos.go(Dir.Up),
-    pos.go(Dir.Down),
-    pos.go(Dir.Left),
-    pos.go(Dir.Right),
-  )
-  // def maxX(other: Pos): Pos = (pos._1 max other._1, pos._2)
-  // def maxY(other: Pos): Pos = (pos._1, pos._2 max other._2)
+object PosExt {
+  def cmp(a: Pos, b: Pos): Boolean = {
+    if (a._2 != b._2)
+        a._2 < b._2
+      else
+        a._1 < b._1
+  }
 
-  
+  extension (pos: Pos)
+    infix def go(dir: Pos): Pos = (pos._1 + dir._1, pos._2 + dir._2)
+
+    infix def max(other: Pos): Pos = (pos._1 max other._1, pos._2 max other._2)
+    
+    infix def +(other: Pos): Pos = (pos._1 + other._1, pos._2 + other._2)
+    infix def -(other: Pos): Pos = (pos._1 - other._1, pos._2 - other._2)
+
+    infix def within(dim: Pos): Boolean =
+      pos._1 >= 0 && pos._1 <= dim._1 &&
+      pos._2 >= 0 && pos._2 <= dim._2
+
+    def around(): List[Pos] = List(
+      pos.go(Dir.Up),
+      pos.go(Dir.Down),
+      pos.go(Dir.Left),
+      pos.go(Dir.Right),
+    )
+
+    def delta(other: Pos): Pos = (
+      (pos._1 - other._1),
+      (pos._2 - other._2)
+    )
+}
+

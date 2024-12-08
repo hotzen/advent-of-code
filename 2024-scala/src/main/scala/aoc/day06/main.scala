@@ -3,10 +3,7 @@ package day06
 import scala.io.Source
 import aoc.Pos
 import scala.collection.mutable
-import aoc.max
-import aoc.isWithin
-import aoc.go
-import aoc.around
+import aoc.PosExt.*
 
 val in = Source
   .fromFile("input/day06.txt")
@@ -41,7 +38,7 @@ def findPath(guardPos: Pos, guardDir: Pos, obstacles: Set[Pos], dim: Pos): Map[P
   var curPos = guardPos
   var curDir = guardDir
 
-  while (curPos.isWithin(dim)) {
+  while (curPos.within(dim)) {
     path.addOne(curPos, curDir)
     val nextPos = curPos.go(curDir)
     if (obstacles.contains(nextPos)) {
@@ -64,7 +61,7 @@ def findLoop(guardPos: Pos, guardDir: Pos, obstacles: Set[Pos], dim: Pos): Boole
   var curPos = guardPos
   var curDir = guardDir
 
-  while (curPos.isWithin(dim)) {
+  while (curPos.within(dim)) {
     path(curPos) = path.getOrElse(curPos, List()) :+ curDir
 
     val nextPos = curPos.go(curDir)
